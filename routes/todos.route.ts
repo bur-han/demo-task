@@ -24,6 +24,18 @@ router.get('/:id', getTodo, (req, res) => {
 
 // Creating one
 router.post('/', async (req, res) => {
+  if(process.env.ORM === 'Mongoose')
+{
+  let Todo = todo.createTodo(req.body)
+  try {
+    const newTodo = await Todo.save()
+    res.status(201).json(newTodo)
+  } catch (err: any) {
+    res.status(400).json({ message: err.message })
+  }
+}
+if(process.env.ORM === 'Sequelize')
+{
   todo.createTodo(req.body)
   .then(async (todo:any) => {
     try {
@@ -33,6 +45,9 @@ router.post('/', async (req, res) => {
       res.status(400).json({ message: err.message })
     }
   })
+ 
+}
+ 
 })
 
 // // Updating One
