@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
-const Sequelize = require('sequelize');
-const db = require('../config/database');
+import Sequelize from 'sequelize';
+import {db} from '../helpers/database'
 import { v4 as uuidv4 } from 'uuid';
 
+var TodoModel:any
 if(process.env.ORM === 'Mongoose')
 {
   const todoSchema = new mongoose.Schema({
@@ -13,19 +14,12 @@ if(process.env.ORM === 'Mongoose')
       type: String,
       required: true
     },
-    // createdAt: {
-    //   type: Date,
-    //   required: true,
-    //   default: Date.now
-    // }
   })
-  
-  module.exports = mongoose.model('Todos', todoSchema)
+  TodoModel = mongoose.model('Todos', todoSchema)
 }
-
 if(process.env.ORM === 'Sequelize')
 {
-  const Todo = db.define('todos', {
+  TodoModel = db.define('todos', {
     id: {
       type: Sequelize.UUID,
       defaultValue: Sequelize.UUIDV1,
@@ -35,12 +29,8 @@ if(process.env.ORM === 'Sequelize')
       type: Sequelize.STRING
     }
   });
-  
-  // Todo.sync().then(() => {
-  //   console.log('table created');
-  // });
-  module.exports = Todo;
 }
+export default TodoModel
 
 
 
