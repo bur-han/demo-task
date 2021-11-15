@@ -1,11 +1,10 @@
 require('dotenv').config()
 import express from 'express'
+import routes from './http/routes/index.route'
 
 const app = express();
 app.use(express.json())
-
-import todosRouter from './routes/todos.route'
-app.use('/todos', todosRouter)
+app.use(routes)
 
 // listen for requests
 app.listen(3000, () => {
