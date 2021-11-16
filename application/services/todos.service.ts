@@ -1,5 +1,4 @@
-import TodoModel from './models/todo.model'
-import TodoFactory from '../infrastructure/factories/todo.factory'
+import TodoModel from '../models/todo.model'
 
 class TodosService {
     public async getTodos(req:any,res:any){
@@ -14,7 +13,9 @@ class TodosService {
 
     public async createTodo(req:any, res:any) {
         try{
-            var todo = TodoFactory.createNewTodo(req.body.name)
+            var todo = new TodoModel({
+                name: req.body.name
+            })
               await todo.save()
               res.status(201).json(todo)
         }
