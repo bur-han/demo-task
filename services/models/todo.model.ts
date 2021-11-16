@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import Sequelize from 'sequelize';
-import {db} from '../helpers/database'
+import {db} from '../../infrastructure/database/database'
 import { v4 as uuidv4 } from 'uuid';
 
 var TodoModel:any

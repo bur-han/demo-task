@@ -3,13 +3,17 @@ import { Sequelize } from 'sequelize';
 let db:any
 if(process.env.ORM === 'Sequelize')
 {
+  try{
     db = new Sequelize('todos', 'postgres', 'electric tomato', {
-        host: 'localhost',
-        dialect: 'postgres'
-      });
-    db.authenticate()
-    .then(() => console.log('Database connected'))
-    .catch((err: any) => console.log('Error: ' + err))
+      host: 'localhost',
+      dialect: 'postgres'
+    });
+  db.authenticate()
+  console.log('Database connected')
+  }
+  catch(err){
+    console.log('Error: ' + err)
+  }
 }
 if(process.env.ORM === 'Mongoose')
 {

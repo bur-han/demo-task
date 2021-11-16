@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
-import UserModel from '../../models/user.model'
+import UserModel from './models/user.model'
 
 
 class AuthService {
     public async login(req:any,res:any){
-        await UserModel.find({email: req.body.email, password: req.body.password})
-        .then((user:any) => {
+        try{
+            var user = await UserModel.find({email: req.body.email, password: req.body.password})
             if(user.length > 0)
             {
                 jwt.sign({user}, 'secretkey', (err:any, token:any) => {
@@ -14,8 +14,10 @@ class AuthService {
             }
             else
             res.status(201).json({ message: 'Email or password does not match' })
-        })
-        .catch((err:any) => res.status(400).json({ message: err.message }))
+        }
+        catch(err:any){
+            res.status(400).json({ message: err.message })
+        }
     }
     public async verifyToken(req:any, res:any, next:any) {
         const bearerHeader = req.headers['authorization'];

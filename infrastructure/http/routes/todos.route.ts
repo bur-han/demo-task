@@ -1,6 +1,6 @@
 import express from 'express'
-import TodoService from '../services/todos.service'
-import AuthService from '../services/auth.service'
+import TodoService from '../../../services/todos.service'
+import AuthService from '../../../services/auth.service'
 
 const router = express.Router()
 const todoService = new TodoService()
