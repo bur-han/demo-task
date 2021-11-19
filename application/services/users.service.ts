@@ -1,17 +1,12 @@
-import UserModel from "../models/user.model"
+import config from '../../config';
+import MongooseUserRepository from '../../infrastructure/database/mongoose/repository/mongoose.user.repository';
+import SequelizeUserRepository from '../../infrastructure/database/sequelize/repository/sequelize.user.repository';
+var orm = config.orm === 'Mongoose' ? new MongooseUserRepository(): new SequelizeUserRepository()
+
 class UsersService {
-    public async createUser(req:any,res:any){
-        try{
-            var user = new UserModel({
-                email: req.body.email,
-                password: req.body.password
-            })
-                  await user.save()
-                  res.status(201).json(user)
-        }
-        catch(err:any){
-            res.status(400).json({ message: err.message })
-        }
+    public async createUser(email:any, password:any){
+        var response = orm.create(email,password)
+        return response
     }
 }
 export default UsersService

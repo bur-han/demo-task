@@ -1,11 +1,11 @@
 import express from 'express'
-import AuthService from '../../../application/services/auth.service'
+import AuthController from '../../../infrastructure/http/controllers/auth.controller'
 
 const router = express.Router()
-const authService = new AuthService()
+const authController = new AuthController()
 
 router.post('/login', (req, res) => {
-    authService.login(req, res)
+    authController.login(req,res)
   })
 
   export default router

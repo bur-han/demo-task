@@ -1,38 +1,28 @@
 import jwt from 'jsonwebtoken';
-import UserModel from '../models/user.model'
-
+import config from '../../config';
+import MongooseAuthRepository from '../../infrastructure/database/mongoose/repository/mongoose.auth.repository';
+import SequelizeAuthRepository from '../../infrastructure/database/sequelize/repository/sequelize.auth.repository';
+var orm = config.orm === 'Mongoose' ? new MongooseAuthRepository(): new SequelizeAuthRepository()
 
 class AuthService {
-    public async login(req:any,res:any){
-        try{
-            var user = await UserModel.find({email: req.body.email, password: req.body.password})
-            if(user.length > 0)
-            {
-                jwt.sign({user}, 'secretkey', (err:any, token:any) => {
-                    res.json({token});
-                });
-            }
-            else
-            res.status(201).json({ message: 'Email or password does not match' })
-        }
-        catch(err:any){
-            res.status(400).json({ message: err.message })
-        }
+    public async login(email:any, password:any){
+        var response = orm.login(email,password)
+        return response
     }
-    public async verifyToken(req:any, res:any, next:any) {
-        const bearerHeader = req.headers['authorization'];
+    public async verifyToken(header:any) {
+        const bearerHeader = header;
         if(typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
         jwt.verify(bearerToken, 'secretkey', ((err:any, authData:any) => {
             if(err)
-            res.status(403).json({ message: err.message })
+            return ({message: err.message, status:403});
+            
             else
-            console.log(authData.user)
+            return ({user: authData.user, status:200});
           }));
-        next();
         } else {
-        res.sendStatus(403);
+            return ({message: 'Forbiden', status:403});
         }
   }
 }

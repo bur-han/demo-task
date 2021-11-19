@@ -1,12 +1,12 @@
 import express from 'express'
-import UsersService from '../../../application/services/users.service'
+import UserController from '../controllers/user.controller'
 
 const router = express.Router()
-const userService = new UsersService()
+const userController = new UserController()
 
 // Creating one
 router.post('/', async (req, res) => {
-    userService.createUser(req, res)
+    userController.createUser(req, res)
   })
 
   export default router

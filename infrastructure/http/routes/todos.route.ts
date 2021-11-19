@@ -1,36 +1,36 @@
 import express from 'express'
-import TodoService from '../../../application/services/todos.service'
-import AuthService from '../../../application/services/auth.service'
+import TodoController from '../controllers/todo.controller'
+import AuthController from '../../../infrastructure/http/controllers/auth.controller'
 
 const router = express.Router()
-const todoService = new TodoService()
-const authService = new AuthService()
-const verifyToken =authService.verifyToken
+const todoController = new TodoController()
+const authController = new AuthController()
+const verifyToken =authController.verifyToken
+const googleAuth = authController.getGoogleUrl
 
 // Getting all
-router.get('/', verifyToken, (req, res) => {
-    todoService.getTodos(req,res)
+router.get('/', (req, res) => {
+    todoController.getTodos(req,res)
 })
 
 // Getting One
-router.get('/:id', verifyToken, (req, res) => {
-  todoService.getTodo(req,res)
+router.get('/:id',  (req, res) => {
+  todoController.getTodo(req,res)
 })
 
 // Creating one
-router.post('/', verifyToken, (req, res) => {
-  todoService.createTodo(req, res)
+router.post('/',  (req, res) => {
+  todoController.createTodo(req, res)
 })
 
 // Updating One
-router.put('/:id', verifyToken, (req, res) => {
- todoService.updateTodo(req,res)
+router.put('/:id',  (req, res) => {
+ todoController.updateTodo(req,res)
 })
 
 // Deleting One
-router.delete('/:id', verifyToken, (req, res) => {
- todoService.deleteTodo(req,res)
+router.delete('/:id',  (req, res) => {
+ todoController.deleteTodo(req,res)
 })
-
 
 export default router

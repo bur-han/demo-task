@@ -1,57 +1,32 @@
-import TodoModel from '../models/todo.model'
+import config from '../../config';
+import MongooseTodoRepository from '../../infrastructure/database/mongoose/repository/mongoose.todo.repository';
+import SequelizeTodoRepository from '../../infrastructure/database/sequelize/repository/sequelize.todo.repository';
+var orm = config.orm === 'Mongoose' ? new MongooseTodoRepository(): new SequelizeTodoRepository()
 
 class TodosService {
-    public async getTodos(req:any,res:any){
-        try{
-            var todos = await TodoModel.find()
-            res.json(todos)
-        }
-        catch(err:any){
-            res.status(500).json({ message: err.message })
-        }
+    public async getTodos(){
+        var response =orm.fetchAll()
+        return response
     }
 
-    public async createTodo(req:any, res:any) {
-        try{
-            var todo = new TodoModel({
-                name: req.body.name
-            })
-              await todo.save()
-              res.status(201).json(todo)
-        }
-        catch(err:any){
-            res.status(400).json({ message: err.message })
-        }
+    public async createTodo(name:any) {
+        var response = orm.create(name)
+        return response
 }
 
-    public async updateTodo(req:any, res:any){
-        try{
-            var todo = await TodoModel.findByIdAndUpdate(req.params.id, req.body, {new:true})
-            res.json(todo)
-        }
-        catch(err:any){
-            res.status(500).json({ message: err.message })
-        }
+    public async updateTodo(id:any, body:any){
+        var response = orm.update(id,body)
+        return response
     }
 
-    public async deleteTodo(req:any, res:any){
-        try{
-            var todo = await TodoModel.findByIdAndDelete(req.params.id)
-            res.json(todo)
-        }
-        catch(err:any){
-            res.status(500).json({ message: err.message })
-        }
+    public async deleteTodo(id:any){
+        var response = orm.delete(id)
+        return response
     }
     
-    public async getTodo(req:any, res:any){
-        try{
-            var todo = await TodoModel.findById(req.params.id)
-            res.json(todo)
-        }
-        catch(err:any){
-            res.status(500).json({ message: err.message })
-        }
+    public async getTodo(id:any){
+        var response = orm.fetchById(id)
+        return response
     }
 }
 export default TodosService
