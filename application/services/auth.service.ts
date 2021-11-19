@@ -5,8 +5,8 @@ import SequelizeAuthRepository from '../../infrastructure/database/sequelize/rep
 var orm = config.orm === 'Mongoose' ? new MongooseAuthRepository(): new SequelizeAuthRepository()
 
 class AuthService {
-    public async login(email:any, password:any){
-        var response = orm.login(email,password)
+    public async login(email:any){
+        var response = orm.login(email)
         return response
     }
     public async verifyToken(header:any) {

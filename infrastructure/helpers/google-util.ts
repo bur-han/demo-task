@@ -1,5 +1,7 @@
 import { google } from 'googleapis';
 import config from '../../config';
+import axios from 'axios';
+import { response } from 'express';
 
 const googleConfig = {
   clientId: config.googleClientId, 
@@ -18,7 +20,7 @@ function createConnection() {
 
  // This scope tells google what information we want to request.
  const defaultScope = [
-    'https://www.googleapis.com/auth/plus.me',
+    'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
   ];
 
@@ -36,6 +38,35 @@ function urlGoogle() {
     const auth = createConnection(); // this is from previous step
     const url = getConnectionUrl(auth);
     return {url, auth};
-  }
+}
 
-export default urlGoogle
+async function getUserEmail(code:any) {
+    try{
+        const { data } = await axios({
+            url: `https://oauth2.googleapis.com/token`,
+            method: 'post',
+            data: {
+              client_id: config.googleClientId,
+              client_secret: config.googleClientSecret,
+              redirect_uri: 'http://localhost:3000/todos',
+              grant_type: 'authorization_code',
+              code,
+            },
+          });
+          const user  = await axios({
+            url: 'https://www.googleapis.com/oauth2/v2/userinfo',
+            method: 'get',
+            headers: {
+              Authorization: `Bearer ${data.access_token}`,
+            },
+          });
+          return ((user as any).data.email)
+    }
+    catch(err)
+    {
+        response.json(err)
+    }
+ 
+  };
+
+export {urlGoogle,getUserEmail}

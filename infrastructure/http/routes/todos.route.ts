@@ -5,11 +5,10 @@ import AuthController from '../../../infrastructure/http/controllers/auth.contro
 const router = express.Router()
 const todoController = new TodoController()
 const authController = new AuthController()
-const verifyToken =authController.verifyToken
-const googleAuth = authController.getGoogleUrl
+const googleAuth = authController.googleAuth
 
 // Getting all
-router.get('/', (req, res) => {
+router.get('/', googleAuth, (req, res) => {
     todoController.getTodos(req,res)
 })
 

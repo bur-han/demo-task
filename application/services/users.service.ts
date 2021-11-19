@@ -4,8 +4,8 @@ import SequelizeUserRepository from '../../infrastructure/database/sequelize/rep
 var orm = config.orm === 'Mongoose' ? new MongooseUserRepository(): new SequelizeUserRepository()
 
 class UsersService {
-    public async createUser(email:any, password:any){
-        var response = orm.create(email,password)
+    public async createUser(email:any){
+        var response = orm.create(email)
         return response
     }
 }

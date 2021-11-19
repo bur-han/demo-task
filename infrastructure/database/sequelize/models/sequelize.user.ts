@@ -8,9 +8,7 @@ var UserModel = db.define('users', {
     },
     email: {
       type: (Sequelize as any).STRING
-    },
-    password: {
-        type: (Sequelize as any).STRING
-      }
+    }
+   
   });
   export default UserModel

@@ -2,11 +2,10 @@ import UserRepositoryI from '../../interfaces/user.interface'
 import UserModel from '../models/mongoose.user'
 
 class MongooseUserRepository implements UserRepositoryI{
-  public async create(email:any, password:any){
+  public async create(email:any){
         try{
             var user = new (UserModel as any)({
-                email: email,
-                password: password
+                email: email
             })
                   await user.save()
                   return ({user:user, status:201});

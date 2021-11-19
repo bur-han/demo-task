@@ -1,5 +1,5 @@
 
 interface AuthRepositoryI {
-    login(email:any, password:any):any
+    login(email:any):any
 }
 export default AuthRepositoryI
