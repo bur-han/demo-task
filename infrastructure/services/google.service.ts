@@ -1,9 +1,9 @@
 import { google } from 'googleapis';
-import config from '../../config';
+import config from '../config/google';
 import axios from 'axios';
 import { response } from 'express';
 
-const googleConfig = {
+const googleCreds = {
   clientId: config.googleClientId, 
   clientSecret: config.googleClientSecret, 
   redirect: 'http://localhost:3000/todos'
@@ -12,9 +12,9 @@ const googleConfig = {
 // Create the google auth object which gives us access to talk to google's apis.
 function createConnection() {
   return new google.auth.OAuth2(
-    googleConfig.clientId,
-    googleConfig.clientSecret,
-    googleConfig.redirect
+    googleCreds.clientId,
+    googleCreds.clientSecret,
+    googleCreds.redirect
   );
 }
 

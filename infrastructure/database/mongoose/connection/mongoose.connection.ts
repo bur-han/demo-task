@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
-import config from '../../../../config'
+import config from '../../../config/db'
 let db:any
 class MongooseConnection {
     public static connect(){
-        console.log('here')
-        mongoose.connect(config.dbUrl as any)
+        mongoose.connect(config.dbUrl as string)
         db = mongoose.connection
         db.on('error', (error: any) => console.error(error))
         db.once('open', () => console.log('Connected to database'))

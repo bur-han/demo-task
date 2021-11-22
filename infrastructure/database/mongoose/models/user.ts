@@ -13,5 +13,5 @@ const userSchema = new mongoose.Schema({
         required: true
       }
   })
-  var UserModel = mongoose.model('Users', userSchema)
+  let UserModel = mongoose.model('Users', userSchema)
   export default UserModel

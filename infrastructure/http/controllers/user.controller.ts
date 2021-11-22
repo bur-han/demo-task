@@ -3,13 +3,16 @@ const userService = new UsersService()
 
 class UserController {
     public async createUser(req:any,res:any){
-        var response = await userService.createUser(req.body.email)
+        let response = await userService.createUser(req.body.email, req.body.password)
         try{
-            if((response as any).status === 201)
+            if((response as any).user)
                 res.status(201).json({user: (response as any).user})
+
+                if(!(response as any).user)
+                res.status(400).json({message: 'Must provide both email and password'})
         }
         catch(err){
-            res.status(400).json({ message: (response as any).message })
+            res.status(500).json({ message: (response as any).message })
         }
     }
 }

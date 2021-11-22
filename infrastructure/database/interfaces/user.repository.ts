@@ -1,5 +1,5 @@
 
 interface UserRepositoryI {
-    create(email:any):any
+    create(email:string, password:string):any
 }
 export default UserRepositoryI

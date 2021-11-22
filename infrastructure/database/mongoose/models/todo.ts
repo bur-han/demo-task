@@ -9,5 +9,5 @@ const todoSchema = new mongoose.Schema({
       required: true
     },
   })
-  var TodoModel = mongoose.model('Todos', todoSchema)
+  let TodoModel = mongoose.model('Todos', todoSchema)
   export default TodoModel

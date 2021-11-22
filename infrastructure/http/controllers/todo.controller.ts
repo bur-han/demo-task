@@ -3,9 +3,11 @@ const todosService = new TodosService()
 
 class TodoController {
     public async getTodos(req:any,res:any){
+        const limit = req.query.limit;
+        const offset = (req.query.page - 1) * limit;
         try{
-        var response = await todosService.getTodos()
-            if((response as any).status === 200)
+        let response = await todosService.getTodos(limit,offset)
+            if((response as any).todos)
                 res.status(200).json({todos: (response as any).todos})
         }
         catch(err){
@@ -13,19 +15,21 @@ class TodoController {
         }
     }
     public async createTodo(req:any, res:any) {
-        var response = await todosService.createTodo(req.body.name)
+        let response = await todosService.createTodo(req.body.name)
         try{
-            if((response as any).status === 201)
+            if((response as any).todo)
                 res.status(201).json({todo: (response as any).todo})
+            if(!(response as any).todo)
+                res.status(400).json({message: 'No name provided'})
         }
         catch(err){
             res.status(400).json({ message: (response as any).message })
         }
     }
     public async updateTodo(req:any, res:any){
-        var response = await todosService.updateTodo(req.params.id, req.body)
+        let response = await todosService.updateTodo(req.params.id, req.body)
         try{
-            if((response as any).status === 200)
+            if((response as any).todo)
                 res.status(200).json({token: (response as any).token})
         }
         catch(err){
@@ -33,9 +37,9 @@ class TodoController {
         }
     }
     public async getTodo(req:any, res:any){
-        var response = await todosService.getTodo(req.params.id)
+        let response = await todosService.getTodo(req.params.id)
         try{
-            if((response as any).status === 200)
+            if((response as any).todo)
                 res.status(200).json({todo: (response as any).todo})
         }
         catch(err){
@@ -43,10 +47,10 @@ class TodoController {
         }
     }
     public async deleteTodo(req:any, res:any){
-        var response = await todosService.deleteTodo(req.params.id)
+        let response = await todosService.deleteTodo(req.params.id)
         try{
-            if((response as any).status === 200)
-                res.status(200).json({token: (response as any).token})
+            if((response as any).todo)
+                res.status(200).json({todo: (response as any).todo})
         }
         catch(err){
             res.status(500).json({ message: (response as any).message })

@@ -1,14 +1,13 @@
 import { Sequelize } from 'sequelize';
-import db from '../../../helpers/connection'
-var UserModel = db.define('users', {
+import db from '../../connection'
+let TodoModel = db.define('todos', {
     id: {
       type: (Sequelize as any).UUID,
       defaultValue: (Sequelize as any).UUIDV1,
       primaryKey: true
     },
-    email: {
+    name: {
       type: (Sequelize as any).STRING
     }
-   
   });
-  export default UserModel
+  export default TodoModel
