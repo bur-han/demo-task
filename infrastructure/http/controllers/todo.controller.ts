@@ -1,36 +1,37 @@
 import TodosService from "../../../application/services/todos.service";
+import PaginationOptions from "../../../Domain/Utils/Pagination/pagination.options";
 const todosService = new TodosService()
 
 class TodoController {
     public async getTodos(req:any,res:any){
-        const limit = req.query.limit;
-        const offset = (req.query.page - 1) * limit;
+        const pagination = new PaginationOptions(req.query.page, req.query.perpage)
+        let response = await todosService.getTodos(pagination)
         try{
-        let response = await todosService.getTodos(limit,offset)
-            if((response as any).todos)
-                res.status(200).json({todos: (response as any).todos})
+            if((response as any).data)
+                res.status(200).json({todos: (response as any)})
         }
         catch(err){
             res.status(500).json({ message: (err as any).message })
         }
     }
     public async createTodo(req:any, res:any) {
-        let response = await todosService.createTodo(req.body.name)
         try{
+        let response = await todosService.createTodo(req.body.name)
+        console.log(response)
             if((response as any).todo)
                 res.status(201).json({todo: (response as any).todo})
-            if(!(response as any).todo)
-                res.status(400).json({message: 'No name provided'})
+            if((response as any).message)
+                res.status(400).json({message: (response as any).message})
         }
-        catch(err){
-            res.status(400).json({ message: (response as any).message })
+        catch(err:any){
+            res.status(500).json({ message: err.message })
         }
     }
     public async updateTodo(req:any, res:any){
         let response = await todosService.updateTodo(req.params.id, req.body)
         try{
             if((response as any).todo)
-                res.status(200).json({token: (response as any).token})
+                res.status(200).json({todo: (response as any).todo})
         }
         catch(err){
             res.status(500).json({ message: (response as any).message })

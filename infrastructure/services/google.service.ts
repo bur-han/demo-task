@@ -1,46 +1,47 @@
 import { google } from 'googleapis';
 import config from '../config/google';
 import axios from 'axios';
-import { response } from 'express';
+import CustomError from './error.service';
 
-const googleCreds = {
+class GoogleService{
+public googleCreds = {
   clientId: config.googleClientId, 
   clientSecret: config.googleClientSecret, 
   redirect: 'http://localhost:3000/todos'
 };
 
 // Create the google auth object which gives us access to talk to google's apis.
-function createConnection() {
+public async createConnection() {
   return new google.auth.OAuth2(
-    googleCreds.clientId,
-    googleCreds.clientSecret,
-    googleCreds.redirect
+    this.googleCreds.clientId,
+    this.googleCreds.clientSecret,
+    this.googleCreds.redirect
   );
 }
 
  // This scope tells google what information we want to request.
- const defaultScope = [
+ public defaultScope = [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
   ];
 
 // Get a url which will open the google sign-in page and request access to the scope provided (such as calendar events).
- function getConnectionUrl(auth:any) {
+ public async getConnectionUrl(auth:any) {
     return auth.generateAuthUrl({
       access_type: 'offline',
       prompt: 'consent', // access type and approval prompt will force a new refresh token to be made each time signs in
-      scope: defaultScope
+      scope: this.defaultScope
     });
   }
 
 // Create the google url to be sent to the client.
-function urlGoogle() {
-    const auth = createConnection(); // this is from previous step
-    const url = getConnectionUrl(auth);
+public async urlGoogle() {
+    const auth = this.createConnection(); // this is from previous step
+    const url = this.getConnectionUrl(auth);
     return {url, auth};
 }
 
-async function getUserEmail(code:any) {
+public async getUserEmail(code:any) {
     try{
         const { data } = await axios({
             url: `https://oauth2.googleapis.com/token`,
@@ -62,11 +63,11 @@ async function getUserEmail(code:any) {
           });
           return ((user as any).data.email)
     }
-    catch(err)
+    catch(err:any)
     {
-        response.json(err)
+        throw new CustomError(err.message)
     }
  
   };
-
-export {urlGoogle,getUserEmail}
+}
+export default GoogleService

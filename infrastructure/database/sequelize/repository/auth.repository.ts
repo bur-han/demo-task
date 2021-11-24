@@ -1,11 +1,12 @@
-import jwt from 'jsonwebtoken';
 import AuthRepositoryI from '../../interfaces/auth.repository'
 import UserModel from '../models/user'
+import JwtService from '../../../services/jwt.service';
+const jwtService = new JwtService()
 
 class SequelizeAuthRepository implements AuthRepositoryI{
     public async loginWithGoogle(email:string){
         try{
-            let user = await (UserModel as any).findOne({email: email}, {raw:true})
+            let user = await (UserModel as any).findAll({where:{email: email}}, {raw:true})
             if(user.length > 0)
             {
                     return ({user:user});
@@ -19,13 +20,12 @@ class SequelizeAuthRepository implements AuthRepositoryI{
     }
     public async loginWithJwt(email:string,password:string){
         try{
-            let user = await (UserModel as any).findOne({email: email,password:password}, {raw:true})
-            console.log(user)
+            let user = await (UserModel as any).findAll({where:{email: email,password:password}}, {raw:true})
             if(user.length > 0)
             {
-                jwt.sign({user}, 'secretkey', (err:any, token:any) => {
-                    return ({token:token});
-                });
+                const token = jwtService.signToken(user)
+                return ({token:token})
+                
             }
             else
             return ({token:null});

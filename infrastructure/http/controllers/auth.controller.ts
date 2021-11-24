@@ -1,34 +1,30 @@
 import AuthService from '../../../application/services/auth.service'
-import {urlGoogle} from '../../services/google.service';
-import {getUserEmail} from '../../services/google.service'
-import jwt from 'jsonwebtoken';
+import GoogleService from '../../services/google.service';
+import JwtService from '../../services/jwt.service';
 const authService = new AuthService()
+const jwtService = new JwtService()
+const googleService = new GoogleService()
 
 class AuthController {
     public async googleAuth(req:any,res:any, next:any) {
     if(req.headers['code'])
     {
         try{
-            let email = await getUserEmail(req.headers['code'])
+            let email = await googleService.getUserEmail(req.headers['code'])
             let response = await authService.loginWithGoogle(email)
-            try{
                 if((response as any).user)
                     next()
 
                 if(!(response as any).user)
                     res.status(400).json({ message: 'Email or password does not match' })
-            }
-            catch(err){
-                       res.status(500).json({ message: (response as any).message })
-                    }
         }
-        catch(err){
-            res.json(err)
+        catch(err:any){
+            res.status(500).json({ message: err.message })
         }
     }
     else
     {
-        let url = urlGoogle().url
+        let url = await googleService.urlGoogle()
         res.json({url})
     }
   }
@@ -37,14 +33,19 @@ class AuthController {
     if(typeof bearerHeader !== 'undefined') {
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
-    jwt.verify(bearerToken, 'secretkey', ((err:any, authData:any) => {
-        if(err)
-        res.status(403).json({ message: err.message })
-        else
-        console.log(authData.user)
-      }));
-    next();
-    } else {
+    try{
+        let response = await jwtService.verifyToken(bearerToken)
+        if((response as any).user)
+            next()
+
+        if(!(response as any).user)
+            res.status(400).json({ message: (response as any).message })
+    }
+    catch(err:any)
+    {
+        res.status(500).json({ message: err.message })
+    }
+    }else {
     res.sendStatus(403);
     }
 }

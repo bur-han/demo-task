@@ -1,6 +1,6 @@
-
+import PaginationOptions from '../../../Domain/Utils/Pagination/pagination.options'
 interface TodoRepositoryI {
-    fetchAll(limit:number, offset:number):any;
+    fetchAll(pagination:PaginationOptions):any;
     fetchById(id: string):any;
     create(name:string):any
     update(id:string, body:any):any

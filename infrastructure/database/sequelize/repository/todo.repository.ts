@@ -1,10 +1,18 @@
 import TodoRepositoryI from '../../interfaces/todo.repository'
+import TodoEntity from '../../../../Domain/Todo/todo.entity';
+import PaginatedCollection from '../../../../Domain/Utils/Pagination/pagination.collection';
 import TodoModel from '../models/todo';
+import CustomError from '../../../services/error.service';
+import PaginationOptions from '../../../../Domain/Utils/Pagination/pagination.options';
 class SequelizeTodoRepository implements TodoRepositoryI {
-    public async fetchAll(limit:number,offset:number) {
+    public async fetchAll(pagination: PaginationOptions) {
         try{
-            let todos = await (TodoModel as any).findAll({offset:offset,limit:limit},{raw:true})
-            return ({todos:todos});
+            let todos = await (TodoModel as any).findAndCountAll({limit: pagination.limit(), offset:pagination.offset()},{raw:true})
+            const todosCollection = todos.rows.map((todo:any) => {
+                return TodoEntity.createFromDb(todo)
+            })
+            const paginatedCollection = new PaginatedCollection<TodoEntity>(pagination, todos.count, todosCollection);
+            return paginatedCollection.getPaginatedData();
         }
         catch(err:any){
             return ({message:err.message});
@@ -13,7 +21,7 @@ class SequelizeTodoRepository implements TodoRepositoryI {
     public async fetchById(id:string){
         try{
             let todo = await (TodoModel as any).findByPk(id)
-            return ({todo:todo});
+            return TodoEntity.createFromDb(todo);
         }
         catch(err:any){
             return ({message:err.message});
@@ -21,16 +29,14 @@ class SequelizeTodoRepository implements TodoRepositoryI {
     }
     public async create(name:string) {
         try{
-            if(!name)
+            if(name)
             {
-                let todo = new (TodoModel as any)({
-                    name: name
-                })
-                  await todo.save()
-                  return ({todo:todo});
+                let todo = TodoEntity.createFromInput(name)
+                let result = await TodoModel.create(todo);
+                return TodoEntity.createFromDb(result);
             }
             if(!name)
-              return ({todo:null});
+            throw new CustomError(400, 'Must provide a name')
         }
         catch(err:any){
             return ({message:err.message});
@@ -38,7 +44,7 @@ class SequelizeTodoRepository implements TodoRepositoryI {
     }
     public async update(id:string, body:any){
         try{
-            let todo = await (TodoModel as any).update(body,{where: {id:id}})
+            let todo = await (TodoModel as any).update({name:body.name},{where: {id:id}})
             return ({todo:todo});
         }
         catch(err:any){

@@ -1,9 +1,10 @@
+import PaginationOptions from '../../../../Domain/Utils/Pagination/pagination.options';
 import TodoRepositoryI from '../../interfaces/todo.repository'
 import TodoModel from '../models/todo';
 class MongooseTodoRepository implements TodoRepositoryI{
-    public async fetchAll(limit:number, offset:number) {
+    public async fetchAll(pagination:PaginationOptions) {
         try{
-            let todos = await (TodoModel as any).find().limit(limit).skip(offset)
+            let todos = await (TodoModel as any).find()
             return ({todos:todos});
         }
         catch(err:any){

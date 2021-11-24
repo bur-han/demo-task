@@ -1,11 +1,12 @@
 import config from '../../infrastructure/config/db';
 import MongooseTodoRepository from '../../infrastructure/database/mongoose/repository/todo.repository';
+import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
 import SequelizeTodoRepository from '../../infrastructure/database/sequelize/repository/todo.repository';
 let orm = config.orm === 'Mongoose' ? new MongooseTodoRepository(): new SequelizeTodoRepository()
 
 class TodosService {
-    public async getTodos(limit:number, offset:number){
-        let response =orm.fetchAll(limit,offset)
+    public async getTodos(pagination:PaginationOptions){
+        let response =orm.fetchAll(pagination)
         return response
     }
 

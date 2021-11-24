@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import logger from '../../../services/logger.service';
 let db:any
 class SequelizeConnection {
     public static connect(){
@@ -8,10 +9,10 @@ class SequelizeConnection {
               dialect: 'postgres'
             });
           db.authenticate()
-          console.log('Database connected')
+          logger.info('Database connected')
           }
           catch(err){
-            console.log('Error: ' + err)
+            logger.error('Error: ' + err)
           }
           db.Sequelize = Sequelize
           return db
