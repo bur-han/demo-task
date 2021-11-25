@@ -2,7 +2,6 @@ import TodoRepositoryI from '../../interfaces/todo.repository'
 import TodoEntity from '../../../../Domain/Todo/todo.entity';
 import PaginatedCollection from '../../../../Domain/Utils/Pagination/pagination.collection';
 import TodoModel from '../models/todo';
-import CustomError from '../../../services/error.service';
 import PaginationOptions from '../../../../Domain/Utils/Pagination/pagination.options';
 class SequelizeTodoRepository implements TodoRepositoryI {
     public async fetchAll(pagination: PaginationOptions) {
@@ -36,7 +35,7 @@ class SequelizeTodoRepository implements TodoRepositoryI {
                 return TodoEntity.createFromDb(result);
             }
             if(!name)
-            throw new CustomError(400, 'Must provide a name')
+              return ({todo:null});
         }
         catch(err:any){
             return ({message:err.message});
