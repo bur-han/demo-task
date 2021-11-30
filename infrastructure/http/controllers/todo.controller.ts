@@ -17,11 +17,10 @@ class TodoController {
     public async createTodo(req:any, res:any) {
         try{
         let response = await todosService.createTodo(req.body.name)
-        console.log(response)
-            if((response as any).todo)
-                res.status(201).json({todo: (response as any).todo})
-            if((response as any).message)
-                res.status(400).json({message: (response as any).message})
+            if((response as any).name)
+                res.status(201).json({todo: (response as any)})
+            if(!(response as any).name)
+                res.status(400).json({message: 'Must provide a name'})
         }
         catch(err:any){
             res.status(500).json({ message: err.message })

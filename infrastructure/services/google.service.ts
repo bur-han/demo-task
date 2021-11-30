@@ -1,7 +1,6 @@
 import { google } from 'googleapis';
 import config from '../config/google';
 import axios from 'axios';
-import CustomError from './error.service';
 
 class GoogleService{
 public googleCreds = {
@@ -65,7 +64,7 @@ public async getUserEmail(code:any) {
     }
     catch(err:any)
     {
-        throw new CustomError(err.message)
+        return ({message:err.message});
     }
  
   };
