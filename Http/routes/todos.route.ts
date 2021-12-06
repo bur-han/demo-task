@@ -1,17 +1,11 @@
 import express from 'express'
 import TodoController from '../controllers/todo.controller'
-import AuthController from '../controllers/auth.controller'
-import AuthService from '../../App/Application/Services/auth.service'
-import config from '../../App/Infrastructure/Config/db'
+import Authentication from '../Middleware/auth'
 
 const router = express.Router()
 const todoController = new TodoController()
-const authController = new AuthController()
-const verifyToken =authController.verifyToken
-const googleAuth = authController.googleAuth
-var middleware = config.auth === 'google' ? googleAuth: verifyToken
 // Getting all
-router.get('/', middleware, (req:any, res:any) => {
+router.get('/', Authentication.authenticate, (req:any, res:any) => {
     todoController.getTodos(req,res)
 })
 

@@ -40,7 +40,7 @@ public async urlGoogle() {
     return {url, auth};
 }
 
-public async getUserEmail(code:any) {
+public async getUserProfile(code:any) {
     try{
         const { data } = await axios({
             url: `https://oauth2.googleapis.com/token`,
@@ -60,7 +60,7 @@ public async getUserEmail(code:any) {
               Authorization: `Bearer ${data.access_token}`,
             },
           });
-          return ((user as any).data.email)
+          return ((user as any).data)
     }
     catch(err:any)
     {

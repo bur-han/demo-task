@@ -1,29 +1,32 @@
+import TodoEntity from "../../Todo/todo.entity"
 import PaginationOptions from "./pagination.options"
 
-class PaginatedCollection<T> {
-    items: T[]
+class PaginatedCollection {
+    data: TodoEntity[]
     totalItems: number
     perPage: number
     currentPage: number
+    totalPages: any
+  
     
-    constructor(paginationOptions: PaginationOptions, totalItems: number, items: T[]){
+    constructor(paginationOptions: PaginationOptions, totalItems: number, items: TodoEntity[]){
         this.perPage = paginationOptions.perpage;
         this.currentPage = paginationOptions.page;
         this.totalItems = totalItems;
-        this.items = items;
+        this.data = items;
     }
 
-    get totalPages():number {
+    getTotalPages():number {
         return Math.ceil(this.totalItems / this.perPage);
     }
     
     getPaginatedData(){
         const paginatedData = {
             totalItems: this.totalItems,
-            totalPages: this.totalPages,
+            totalPages: this.getTotalPages(),
             currentPage: this.currentPage,
             perPage: this.perPage,
-            data: this.items
+            data: this.data
         }
         return paginatedData;
     }

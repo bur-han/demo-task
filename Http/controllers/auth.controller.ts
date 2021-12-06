@@ -1,66 +1,52 @@
-import AuthService from '../../App/Application/Services/auth.service';
-import GoogleService from '../../App/Infrastructure/Services/google.service';
-import JwtService from '../../App/Infrastructure/Services/jwt.service';
-import { LoginInputI } from '../../App/Domain/Interfaces/auth.repository';
-const authService = new AuthService()
-const jwtService = new JwtService()
-const googleService = new GoogleService()
+import UserEntity from '../../App/Domain/User/user.entity';
+import GoogleAuthService from '../../App/Infrastructure/Auth/google.auth.service';
+import UserAuthService from '../../App/Infrastructure/Auth/user.auth.service';
+import GoogleAuth from '../../App/Infrastructure/Helpers/google.auth';
+import SequelizeUserRepository from '../../App/Infrastructure/MySqlrepository/user.repository';
 
 class AuthController {
-    public async googleAuth(req:any,res:any, next:any) {
-    if(req.headers['code'])
-    {
+    async loginUser (req: any, res:any) {
         try{
-            let response = await authService.login(req.headers['code'], undefined, undefined)
-                if((response as any).user)
-                    next()
-
-                if(!(response as any).user)
-                    res.status(400).json({ message: 'Email or password does not match' })
-        }
-        catch(err:any){
-            res.status(500).json({ message: err.message })
-        }
+        const userEntity = UserEntity.createFromInput(req.body.email, req.body.password);
+        const userAuthService = new UserAuthService(new SequelizeUserRepository);
+        const user = await userAuthService.login(userEntity);
+        res.status(200).json({
+            message: user
+        });
     }
-    else
-    {
-        let url = await googleService.urlGoogle()
-        res.json({url})
+    catch(err:any){
+        res.status(err.statusCode).json({ message: err.message })
     }
-  }
-  public async verifyToken(req:any, res:any, next:any) {
-    const bearerHeader = req.headers['authorization'];
-    if(typeof bearerHeader !== 'undefined') {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    try{
-        let response = await jwtService.verifyToken(bearerToken)
-        if((response as any).user)
-            next()
-
-        if(!(response as any).user)
-            res.status(400).json({ message: (response as any).message })
     }
-    catch(err:any)
-    {
-        res.status(500).json({ message: err.message })
-    }
-    }else {
-    res.sendStatus(403);
-    }
-}
-    public async loginWithJwt(req:any,res:any, next:any){
+    async getUrlForGoogleUser(req:any, res:any) {
         try{
-        let response = await authService.login(undefined, req.body.email,req.body.password)
-            if((response as any).token)
-            res.status(200).json({ token: (response as any).token})
-
-            if(!(response as any).token)
-            res.status(400).json({ message: 'Email or password does not match' })
-        }
-         catch(err:any){
-           res.status(500).json({ message: err.message })
-        }
+        const googleAuth = new GoogleAuth
+        res.status(200).json({
+            url: await googleAuth.urlGoogle()
+        });
     }
+    catch(err:any){
+        res.status(err.statusCode).json({ message: err.message })
+    }
+    }
+
+    async getGoogleUserProfile(req:any, res:any) {
+        try{
+        const googleAuth = new GoogleAuth();
+        const result = await googleAuth.getUserProfile(req.query.code);
+        const googleAuthService = new GoogleAuthService(new SequelizeUserRepository);
+        const user = UserEntity.createFromInput(result.email, 'someRandomPassword');
+        const token = await googleAuthService.login(user);
+
+        res.status(200).json({
+            message: "User logged in successfully!",
+            token
+        });
+    }
+    catch(err:any){
+        res.status(err.statusCode).json({ message: err.message })
+    }
+    }
+
 }
 export default AuthController

@@ -44,7 +44,7 @@ program
   .command('remove <id>')
   .alias('r')
   .description('Remove a todo')
-  .action(id => todosService.deleteTodo(id));
+  .action(id => todosService.deconsteTodo(id));
 
 // List Command
 program

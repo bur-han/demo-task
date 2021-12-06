@@ -1,31 +1,30 @@
+import TodoEntity from '../../Domain/Todo/todo.entity';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
-import SequelizeTodoRepository from '../../Infrastructure/MySqlrepository/sequelize/todo.repository';
-let repository = new SequelizeTodoRepository()
+import SequelizeTodoRepository from '../../Infrastructure/MySqlrepository/todo.repository';
 
 class TodosService {
+    public repository
+    constructor(sequelizeTodoRepository: SequelizeTodoRepository){
+        this.repository = sequelizeTodoRepository
+    }
     public async getTodos(pagination:PaginationOptions){
-        let response =repository.fetchAll(pagination)
-        return response
+        return this.repository.fetchAll(pagination)
     }
-
     public async createTodo(name:string) {
-        let response = repository.addItem(name)
-        return response
-}
-
+        const todoEntity = TodoEntity.createFromInput(name)
+        return this.repository.addItem(todoEntity)
+    }
     public async updateTodo(id:string, body:any){
-        let response = repository.editItem(id,body)
-        return response
+        const todoEntity:TodoEntity = await this.getTodo(id);
+        todoEntity.name = body.name
+        return this.repository.editItem(todoEntity)
     }
-
     public async deleteTodo(id:string){
-        let response = repository.removeItem(id)
-        return response
+        const todoEntity:TodoEntity = await this.getTodo(id);
+        return this.repository.removeItem(todoEntity)
     }
-    
     public async getTodo(id:string){
-        let response = repository.fetchById(id)
-        return response
+        return this.repository.fetchById(id)
     }
 }
 export default TodosService

@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import db from '../../connection'
-let UserModel = db.define('users', {
+const UserModel = db.define('users', {
     id: {
       type: (Sequelize as any).UUID,
       defaultValue: (Sequelize as any).UUIDV1,
@@ -11,6 +11,16 @@ let UserModel = db.define('users', {
     },
     password: {
       type: (Sequelize as any).STRING
+    },
+    createdAt: {
+      type: (Sequelize as any).DATE,
+        defaultValue: Sequelize.fn('NOW'),
+      allowNull: false
+    },
+    updatedAt: {
+      type: (Sequelize as any).DATE,
+      defaultValue: Sequelize.fn('NOW'),
+        allowNull: false
     }
    
   });

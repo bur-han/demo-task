@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import logger from '../../../Services/logger.service';
+import logger from '../../../Helpers/logger';
 let db:any
 class SequelizeConnection {
     public static connect(){
