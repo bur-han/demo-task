@@ -1,6 +1,5 @@
-import SequelizeConnection from "./sequelize/connection/sequelize.connection";
+import SequelizeConnection from './sequelize/connection/sequelize.connection';
 
-const orm = SequelizeConnection
-const db = orm.connect()
+const db = SequelizeConnection.connect();
 
-export default db
+export default db;

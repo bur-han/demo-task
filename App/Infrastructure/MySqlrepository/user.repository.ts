@@ -1,79 +1,89 @@
 import UserEntity from '../../Domain/User/user.entity';
-import UserRepositoryI from '../../Domain/User/user.repository'
-import UserModel from '../Database/sequelize/models/user'
-import CustomError from '../Helpers/error';
+import UserRepositoryI from '../../Domain/User/user.repository';
+import UserModel from '../Database/sequelize/models/user';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
 import PaginatedCollection from '../../Domain/Utils/Pagination/pagination.collection';
 
-class SequelizeUserRepository implements UserRepositoryI{
-  public async fetchAll(pagination: PaginationOptions) {
-    const users = await (UserModel as any).findAndCountAll({limit: pagination.limit(), offset:pagination.offset()},{raw:true})
-    if(users)
-    {
-        const usersCollection = users.rows.map((user:any) => {
-        return UserEntity.createFromDb(user)
-        })
-        const paginatedCollection = new PaginatedCollection(pagination, users.count, usersCollection);
-        return paginatedCollection.getPaginatedData();
-    }
-    else
-    throw new CustomError(500, 'Internal server error')
-}
-  public async fetchById(id:string){
-    const user = await (UserModel as any).findByPk(id)
-    if(user)
-    return UserEntity.createFromDb(user);
-    else
-    throw new CustomError(500, 'Internal server error')
-}
-public async fetchByEmail(email:string){
-  const user = await (UserModel as any).findOne({where: {email}})
-  if(user)
-  return UserEntity.createFromDb(user);
-  else
-  throw new CustomError(500, 'Internal server error')
-}
-  public async addUser(userEntity: UserEntity){
-    if(userEntity.email && userEntity.password)
-    {
-        const result = await UserModel.create(userEntity);
-        if(result)
-        return UserEntity.createFromDb(result);
-        if(!result)
-        throw new CustomError(500, 'Internal server error')
-    }
-    else
-    {
-        throw new CustomError(400, 'Must provide a valid email and password')
-    }
-    }
-    public async editUser(userEntity: UserEntity){
-      if(userEntity.email && userEntity.password)
-      {
-          const result = await (UserModel as any).update(userEntity,{where: {id:userEntity.id}})
-          if(result)
-          return true
-          if(!result)
-          throw new CustomError(500, 'Internal server error')
-      }
-      else
-      {
-          throw new CustomError(400, 'Must provide a valid email and password')
-      }
+class SequelizeUserRepository implements UserRepositoryI {
+  public async fetchAll(
+    pagination: PaginationOptions
+  ): Promise<PaginatedCollection<UserEntity>> {
+    const users = await (UserModel as any).findAndCountAll({
+      limit: pagination.limit(),
+      offset: pagination.offset(),
+    });
+
+    const usersCollection = users.rows.map((user: any) => {
+      return UserEntity.createFromDb(user);
+    });
+
+    const paginatedCollection = new PaginatedCollection<UserEntity>(
+      pagination,
+      users.count,
+      usersCollection
+    );
+
+    return paginatedCollection;
   }
-  public async removeUser(userEntity: UserEntity){
-      if(userEntity.id)
-      {
-          const result = await (UserModel as any).destroy({where: {id:userEntity.id}})
-          if(result)
-          return true
-          if(!result)
-          throw new CustomError(500, 'Internal server error')
+
+  public async fetchById(id: string) {
+    try {
+      const user = await (UserModel as any).findOne({ where: { id } });
+
+      if (!user) {
+        return false;
       }
-      else
-      {
-          throw new CustomError(400, 'Must provide an id')
+
+      return UserEntity.createFromDb(user);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async fetchByEmail(email: string) {
+    try {
+      const user = await (UserModel as any).findOne({ where: { email } });
+
+      if (!user) {
+        throw new Error('Resource not found');
       }
+
+      return UserEntity.createFromDb(user);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async addUser(userEntity: UserEntity) {
+    try {
+      await UserModel.create(userEntity);
+      return;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async editUser(userEntity: UserEntity) {
+    try {
+      await (UserModel as any).update(userEntity, {
+        where: { id: userEntity.id },
+      });
+      return;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async removeUser(userEntity: UserEntity) {
+    try {
+      await (UserModel as any).destroy({
+        where: { id: userEntity.id },
+      });
+      return;
+    } catch (err) {
+      throw err;
+    }
   }
 }
-export default SequelizeUserRepository
+
+export default SequelizeUserRepository;

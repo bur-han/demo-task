@@ -1,31 +1,70 @@
 import UserEntity from '../../Domain/User/user.entity';
+import UserRepositoryI from '../../Domain/User/user.repository';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
-import SequelizeUserRepository from '../../Infrastructure/MySqlrepository/user.repository';
+import CustomError from '../../Infrastructure/Exceptions/custom-error';
+import { hashIt } from '../../Infrastructure/Services/bcrypt.service';
 
 class UsersService {
-public repository
-    constructor(sequelizeUserRepository: SequelizeUserRepository){
-        this.repository = sequelizeUserRepository
+  public repository;
+
+  constructor(userRepository: UserRepositoryI) {
+    this.repository = userRepository;
+  }
+
+  public async getUsers(pagination: PaginationOptions) {
+    const result = await this.repository.fetchAll(pagination);
+
+    return result.getPaginatedData();
+  }
+
+  public async createUser(email: string, password: string) {
+    try {
+      if (!email || !password) {
+        throw new CustomError(400, 'Must provide both email and password');
+      }
+
+      const hash = await hashIt(password);
+      const userEntity = UserEntity.createFromInput(email, hash);
+
+      await this.repository.addUser(userEntity);
+      return;
+    } catch (err) {
+      throw err;
     }
-    public async getUsers(pagination:PaginationOptions){
-        return this.repository.fetchAll(pagination)
+  }
+
+  public async updateUser(id: string, body: any) {
+    const userEntity = await this.repository.fetchById(id);
+
+    if (!userEntity) {
+      throw new CustomError(400, 'Resource not found');
     }
-    public async createUser(email:string, password:string){
-        const userEntity = UserEntity.createFromInput(email, password)
-        return this.repository.addUser(userEntity)
+
+    userEntity.email = body.email;
+    userEntity.password = body.password;
+
+    return this.repository.editUser(userEntity);
+  }
+
+  public async deleteUser(id: string) {
+    const userEntity = await this.repository.fetchById(id);
+
+    if (!userEntity) {
+      throw new CustomError(400, 'Resource not found');
     }
-    public async updateUser(id:string, body:any){
-        const userEntity:UserEntity = await this.getUser(id);
-        userEntity.email = body.email
-        userEntity.password = body.password
-        return this.repository.editUser(userEntity)
+
+    return this.repository.removeUser(userEntity);
+  }
+
+  public async getUser(id: string) {
+    const userEntity = await this.repository.fetchById(id);
+
+    if (!userEntity) {
+      throw new CustomError(400, 'Resource not found');
     }
-    public async deleteUser(id:string){
-        const userEntity:UserEntity = await this.getUser(id);
-        return this.repository.removeUser(userEntity)
-    }
-    public async getUser(id:string){
-        return this.repository.fetchById(id)
-    }
+
+    return userEntity;
+  }
 }
-export default UsersService
+
+export default UsersService;
