@@ -1,6 +1,9 @@
 import * as jwt from 'jsonwebtoken';
 import config from '../Config/auth';
 import SequelizeUserRepository from '../MySqlrepository/user.repository';
+import { injectable, inject } from 'inversify';
+import TYPES from '../Inversify/types';
+import UserRepositoryI from '../../Domain/User/user.repository';
 
 type AuthToken = string;
 
@@ -9,10 +12,11 @@ interface AuthRepositoryI {
   verifyToken(authtoken: AuthToken): Promise<boolean>;
 }
 
+@injectable()
 class AuthTokenService implements AuthRepositoryI {
   public repository: SequelizeUserRepository;
 
-  constructor(repository: SequelizeUserRepository) {
+  constructor(@inject(TYPES.UserRepositoryI) repository: UserRepositoryI) {
     this.repository = repository;
   }
 

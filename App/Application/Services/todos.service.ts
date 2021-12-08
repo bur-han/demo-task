@@ -2,11 +2,14 @@ import TodoEntity from '../../Domain/Todo/todo.entity';
 import TodoRepositoryI from '../../Domain/Todo/todo.repository';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
 import CustomError from '../../Infrastructure/Exceptions/custom-error';
+import { injectable, inject } from 'inversify';
+import TYPES from '../../Infrastructure/Inversify/types';
 
+@injectable()
 class TodosService {
   public repository;
 
-  constructor(todoRepository: TodoRepositoryI) {
+  constructor(@inject(TYPES.TodoRepositoryI) todoRepository: TodoRepositoryI) {
     this.repository = todoRepository;
   }
 

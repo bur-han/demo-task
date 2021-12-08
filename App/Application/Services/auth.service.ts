@@ -3,41 +3,53 @@ import CustomError from '../../Infrastructure/Exceptions/custom-error';
 import SequelizeUserRepository from '../../Infrastructure/MySqlrepository/user.repository';
 import AuthTokenService from '../../Infrastructure/Services/auth.service';
 import { compareIt } from '../../Infrastructure/Services/bcrypt.service';
+import { injectable, inject } from 'inversify';
+import UserRepositoryI from '../../Domain/User/user.repository';
+import TYPES from '../../Infrastructure/Inversify/types';
 
 type AuthToken = string;
 
 interface AuthRepositoryI {
-  loginWithGoogle(email: string, password: string): Promise<AuthToken>;
-  loginWithJwt(email: string, password: string): Promise<AuthToken>;
+  loginWithGoogle(session: any, email: string): Promise<AuthToken>;
+  loginWithJwt(
+    session: any,
+    email: string,
+    password: string
+  ): Promise<AuthToken>;
 }
 
+@injectable()
 class AuthService implements AuthRepositoryI {
-  public authService: AuthTokenService;
+  public authTokenService: AuthTokenService;
   public repository: SequelizeUserRepository;
 
   constructor(
-    repository: SequelizeUserRepository,
-    authService: AuthTokenService
+    @inject(TYPES.UserRepositoryI) userRepository: UserRepositoryI,
+    @inject(TYPES.AuthTokenService) authTokenService: AuthTokenService
   ) {
-    this.repository = repository;
-    this.authService = authService;
+    this.repository = userRepository;
+    this.authTokenService = authTokenService;
   }
 
-  async loginWithGoogle(email: string): Promise<AuthToken> {
+  async loginWithGoogle(session: any, email: string): Promise<AuthToken> {
     const user = UserEntity.createFromInput(email, 'someRandomPassword');
 
-    localStorage.setItem('userId', user.id);
-    const token = await this.authService.generateToken(user.id);
+    session.userId = user.id;
+    const token = await this.authTokenService.generateToken(user.id);
     return token;
   }
 
-  async loginWithJwt(email: string, password: string): Promise<AuthToken> {
+  async loginWithJwt(
+    session: any,
+    email: string,
+    password: string
+  ): Promise<AuthToken> {
     const userEntity = UserEntity.createFromInput(email, password);
     const dbUser = await this.repository.fetchByEmail(email);
 
     if (await compareIt(password, dbUser.password)) {
-      localStorage.setItem('userId', userEntity.id);
-      const token = await this.authService.generateToken(userEntity.id);
+      session.userId = userEntity.id;
+      const token = await this.authTokenService.generateToken(userEntity.id);
       return token;
     } else {
       throw new CustomError(400, 'Wrong credentials');

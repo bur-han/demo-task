@@ -3,7 +3,9 @@ import TodoEntity from '../../Domain/Todo/todo.entity';
 import PaginatedCollection from '../../Domain/Utils/Pagination/pagination.collection';
 import TodoModel from '../Database/sequelize/models/todo';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
+import { injectable } from 'inversify';
 
+@injectable()
 class SequelizeTodoRepository implements TodoRepositoryI {
   public async fetchAll(
     userId: string,

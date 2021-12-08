@@ -1,11 +1,12 @@
 import TodosService from '../../App/Application/Services/todos.service';
 import PaginationOptions from '../../App/Domain/Utils/Pagination/pagination.options';
-import SequelizeTodoRepository from '../../App/Infrastructure/MySqlrepository/todo.repository';
+import myContainer from '../../App/Infrastructure/Inversify/inversify.config';
+import TYPES from '../../App/Infrastructure/Inversify/types';
 import handleError from '../Util/error.handler';
-const todosService = new TodosService(new SequelizeTodoRepository());
+const todosService = myContainer.get<TodosService>(TYPES.TodosService);
 
 class TodoController {
-  public async getTodos(req: any, res: any) {
+  static async getTodos(req: any, res: any) {
     try {
       const pagination = new PaginationOptions(
         req.query.page,
@@ -23,7 +24,7 @@ class TodoController {
     }
   }
 
-  public async createTodo(req: any, res: any) {
+  static async createTodo(req: any, res: any) {
     try {
       const response = await todosService.createTodo(
         req.session.userId,
@@ -36,7 +37,7 @@ class TodoController {
     }
   }
 
-  public async getTodo(req: any, res: any) {
+  static async getTodo(req: any, res: any) {
     try {
       const response = await todosService.getTodo(req.params.id);
 
@@ -46,7 +47,7 @@ class TodoController {
     }
   }
 
-  public async updateTodo(req: any, res: any) {
+  static async updateTodo(req: any, res: any) {
     try {
       await todosService.updateTodo(req.params.id, req.body.name);
 
@@ -56,7 +57,7 @@ class TodoController {
     }
   }
 
-  public async deleteTodo(req: any, res: any) {
+  static async deleteTodo(req: any, res: any) {
     try {
       await todosService.deleteTodo(req.params.id);
 

@@ -1,32 +1,32 @@
 import express from 'express';
 import UserController from '../controllers/user.controller';
+import Authentication from '../Middleware/auth';
 
 const router = express.Router();
-const userController = new UserController();
 
 // Getting all
-router.get('/', (req: Express.Request, res: Express.Response) => {
-  userController.getUsers(req, res);
+router.get('/', Authentication.authenticate, (req: any, res: any) => {
+  UserController.getUsers(req, res);
 });
 
 // Getting One
 router.get('/:id', (req, res) => {
-  userController.getUser(req, res);
+  UserController.getUser(req, res);
 });
 
 // Creating one
 router.post('/', async (req, res) => {
-  userController.createUser(req, res);
+  UserController.createUser(req, res);
 });
 
 // Updating One
 router.put('/:id', (req, res) => {
-  userController.updateUser(req, res);
+  UserController.updateUser(req, res);
 });
 
 // Deleting One
 router.delete('/:id', (req, res) => {
-  userController.deleteUser(req, res);
+  UserController.deleteUser(req, res);
 });
 
 export default router;

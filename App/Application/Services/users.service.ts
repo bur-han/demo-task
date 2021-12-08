@@ -3,11 +3,14 @@ import UserRepositoryI from '../../Domain/User/user.repository';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
 import CustomError from '../../Infrastructure/Exceptions/custom-error';
 import { hashIt } from '../../Infrastructure/Services/bcrypt.service';
+import { injectable, inject } from 'inversify';
+import TYPES from '../../Infrastructure/Inversify/types';
 
+@injectable()
 class UsersService {
   public repository;
 
-  constructor(userRepository: UserRepositoryI) {
+  constructor(@inject(TYPES.UserRepositoryI) userRepository: UserRepositoryI) {
     this.repository = userRepository;
   }
 
@@ -25,7 +28,6 @@ class UsersService {
 
       const hash = await hashIt(password);
       const userEntity = UserEntity.createFromInput(email, hash);
-
       await this.repository.addUser(userEntity);
       return;
     } catch (err) {

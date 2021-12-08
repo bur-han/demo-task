@@ -1,11 +1,12 @@
 import UsersService from '../../App/Application/Services/users.service';
 import PaginationOptions from '../../App/Domain/Utils/Pagination/pagination.options';
-import SequelizeUserRepository from '../../App/Infrastructure/MySqlrepository/user.repository';
+import myContainer from '../../App/Infrastructure/Inversify/inversify.config';
+import TYPES from '../../App/Infrastructure/Inversify/types';
 import handleError from '../Util/error.handler';
-const userService = new UsersService(new SequelizeUserRepository());
+const userService = myContainer.get<UsersService>(TYPES.UsersService);
 
 class UserController {
-  public async getUsers(req: any, res: any) {
+  static async getUsers(req: any, res: any) {
     try {
       const pagination = new PaginationOptions(
         req.query.page,
@@ -20,7 +21,7 @@ class UserController {
     }
   }
 
-  public async getUser(req: any, res: any) {
+  static async getUser(req: any, res: any) {
     try {
       const response = await userService.getUser(req.params.id);
 
@@ -30,7 +31,7 @@ class UserController {
     }
   }
 
-  public async createUser(req: any, res: any) {
+  static async createUser(req: any, res: any) {
     try {
       await userService.createUser(req.body.email, req.body.password);
       return res.status(201).json({ message: 'Successfully created' });
@@ -39,7 +40,7 @@ class UserController {
     }
   }
 
-  public async updateUser(req: any, res: any) {
+  static async updateUser(req: any, res: any) {
     try {
       await userService.updateUser(req.params.id, req.body);
 
@@ -49,7 +50,7 @@ class UserController {
     }
   }
 
-  public async deleteUser(req: any, res: any) {
+  static async deleteUser(req: any, res: any) {
     try {
       await userService.deleteUser(req.params.id);
 

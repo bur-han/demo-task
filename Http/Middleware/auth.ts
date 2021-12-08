@@ -1,14 +1,18 @@
 import AuthTokenService from '../../App/Infrastructure/Services/auth.service';
-import AuthService from '../../App/Infrastructure/Services/auth.service';
-import SequelizeUserRepository from '../../App/Infrastructure/MySqlrepository/user.repository';
+import TYPES from '../../App/Infrastructure/Inversify/types';
+import myContainer from '../../App/Infrastructure/Inversify/inversify.config';
 
 type AuthToken = string;
+
+const authService = myContainer.get<AuthTokenService>(TYPES.AuthTokenService);
+
 class Authentication {
-  async authenticate(req: any, res: any, next: any) {
+  static async authenticate(req: any, res: any, next: any) {
     if (req.headers.authorization) {
       const token: AuthToken = req.headers.authorization.split(' ')[1];
-      const authService = new AuthService(new SequelizeUserRepository());
+
       const result = await authService.verifyToken(token);
+
       if (result) {
         next();
       } else {

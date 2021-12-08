@@ -3,7 +3,9 @@ import UserRepositoryI from '../../Domain/User/user.repository';
 import UserModel from '../Database/sequelize/models/user';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
 import PaginatedCollection from '../../Domain/Utils/Pagination/pagination.collection';
+import { injectable } from 'inversify';
 
+@injectable()
 class SequelizeUserRepository implements UserRepositoryI {
   public async fetchAll(
     pagination: PaginationOptions
