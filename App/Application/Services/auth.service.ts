@@ -2,10 +2,10 @@ import UserEntity from '../../Domain/User/user.entity';
 import CustomError from '../../Infrastructure/Exceptions/custom-error';
 import SequelizeUserRepository from '../../Infrastructure/MySqlrepository/user.repository';
 import AuthTokenService from '../../Infrastructure/Services/auth.service';
-import { compareIt } from '../../Infrastructure/Services/bcrypt.service';
 import { injectable, inject } from 'inversify';
 import UserRepositoryI from '../../Domain/User/user.repository';
 import TYPES from '../../Infrastructure/Inversify/types';
+import BcryptService from '../../Infrastructure/Services/bcrypt.service';
 
 type AuthToken = string;
 
@@ -47,7 +47,7 @@ class AuthService implements AuthRepositoryI {
     const userEntity = UserEntity.createFromInput(email, password);
     const dbUser = await this.repository.fetchByEmail(email);
 
-    if (await compareIt(password, dbUser.password)) {
+    if (await BcryptService.compareIt(password, dbUser.password)) {
       session.userId = userEntity.id;
       const token = await this.authTokenService.generateToken(userEntity.id);
       return token;

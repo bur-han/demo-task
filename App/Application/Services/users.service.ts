@@ -2,9 +2,9 @@ import UserEntity from '../../Domain/User/user.entity';
 import UserRepositoryI from '../../Domain/User/user.repository';
 import PaginationOptions from '../../Domain/Utils/Pagination/pagination.options';
 import CustomError from '../../Infrastructure/Exceptions/custom-error';
-import { hashIt } from '../../Infrastructure/Services/bcrypt.service';
 import { injectable, inject } from 'inversify';
 import TYPES from '../../Infrastructure/Inversify/types';
+import BcryptService from '../../Infrastructure/Services/bcrypt.service';
 
 @injectable()
 class UsersService {
@@ -26,7 +26,7 @@ class UsersService {
         throw new CustomError(400, 'Must provide both email and password');
       }
 
-      const hash = await hashIt(password);
+      const hash = await BcryptService.hashIt(password);
       const userEntity = UserEntity.createFromInput(email, hash);
       await this.repository.addUser(userEntity);
       return;
